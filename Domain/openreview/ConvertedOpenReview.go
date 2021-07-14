@@ -2,6 +2,7 @@ package openreview
 
 import (
 	"fmt"
+	"log"
 	"regexp"
 )
 
@@ -22,6 +23,7 @@ func (c *ConvertedOpenReview) Convert(sources []string) ([]string, error) {
 	rexM99 := regexp.MustCompile(`^\(M99\)$`)
 	var res []string
 	for _, line := range sources {
+		log.Println("line:", line, "canSkipLine:", canSkipLine)
 		if rexM00.MatchString(line) {
 			continue
 		}

@@ -1,6 +1,10 @@
 package main
 
 import (
+	"OpenReviewConverter/Domain/openreview"
+	"OpenReviewConverter/Infrastructure/ncfile"
+	"OpenReviewConverter/Presentation/mainview"
+	"OpenReviewConverter/UseCase/convertedscript"
 	"flag"
 	"fmt"
 	"log"
@@ -45,4 +49,12 @@ func main() {
 	// 	Flag:   log.Ldate | log.Ltime | log.Lshortfile,
 	// })
 	colog.Register()
+
+	/** 依存性注入 **/
+	converter := openreview.NewConvertedOpenReview()
+	fileReader := ncfile.NewReadableNcScriptFile()
+	fileWriter := ncfile.NewWritableNcScriptFile()
+	convertUseCase := convertedscript.NewConvertedOpenReviewUseCase(converter, fileReader, fileWriter)
+	mv := mainview.NewMainViewController(fmt.Sprintf("%s.%s", version, revision), convertUseCase)
+	(*mv).Initialize()
 }

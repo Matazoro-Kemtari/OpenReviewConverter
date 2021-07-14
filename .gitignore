@@ -37,3 +37,5 @@ ehthumbs.db
 **/testdata/**/output_*
 
 * - コピー.xlsx
+
+*.log

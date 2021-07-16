@@ -24,6 +24,7 @@ func (c *ConvertedOpenReview) Convert(sources []string) ([]string, error) {
 	fmt.Print(idx)
 
 	var canSkipLine bool
+	canAppendPrefix := true
 	rexM00 := regexp.MustCompile(`^M00$`)
 	rexM01 := regexp.MustCompile(`^M01$`)
 	rexM30orM99 := regexp.MustCompile(`^\(M(30|99)\)$`)
@@ -31,9 +32,21 @@ func (c *ConvertedOpenReview) Convert(sources []string) ([]string, error) {
 	canAppendFinallyM30 := true
 	regPercentOrBlank := regexp.MustCompile(`^%?$`)
 	regPercent := regexp.MustCompile(`^%$`)
+	regBlank := regexp.MustCompile(`^$`)
 	var res []string
 	for i, line := range sources {
 		log.Println("line:", line, "canSkipLine:", canSkipLine)
+
+		// オープンレビューのファイルの先頭つける予約語
+		if canAppendPrefix && !regBlank.MatchString(line) {
+			res = append([]string{"%", "O1002"}, res...)
+			canAppendPrefix = false
+			if regPercent.MatchString(line) {
+				// %の場合
+				continue
+			}
+		}
+
 		if rexM00.MatchString(line) {
 			continue
 		}

@@ -25,6 +25,8 @@ func (c *ConvertedOpenReview) Convert(sources []string) ([]string, error) {
 
 	var canSkipLine bool
 	canAppendPrefix := true
+	canSearchedMachiningONumber := true
+	regFdNo := regexp.MustCompile(`^O100[12]$`)
 	rexM00 := regexp.MustCompile(`^M00$`)
 	rexM01 := regexp.MustCompile(`^M01$`)
 	rexM30orM99 := regexp.MustCompile(`^\(M(30|99)\)$`)
@@ -47,16 +49,25 @@ func (c *ConvertedOpenReview) Convert(sources []string) ([]string, error) {
 			}
 		}
 
+		if canSearchedMachiningONumber && regFdNo.MatchString(line) {
+			// 他の命令が出てくる前に、Oナンバーがあったら、無視(消す)
+			canSearchedMachiningONumber = false
+			continue
+		}
+
 		if rexM00.MatchString(line) {
+			canSearchedMachiningONumber = false
 			continue
 		}
 
 		if !canSkipLine && rexM01.MatchString(line) {
 			res = append(res, line)
 			canSkipLine = true
+			canSearchedMachiningONumber = false
 		} else if canSkipLine && rexM30orM99.MatchString(line) {
 			res = append(res, line)
 			canSkipLine = false
+			canSearchedMachiningONumber = false
 		} else if !canSkipLine {
 			if i > 0 && canAppendFinallyM30 && rexM30.MatchString(line) {
 				// M30が見つかったら追記しなくても良いかも
@@ -64,6 +75,11 @@ func (c *ConvertedOpenReview) Convert(sources []string) ([]string, error) {
 			} else if i > 0 && !canAppendFinallyM30 && !regPercentOrBlank.MatchString(line) {
 				// '?' '空行' 以外が見つかったら最後のコマンドじゃなかった
 				canAppendFinallyM30 = true
+			}
+
+			if len(line) > 0 {
+				// 行頭から命令があったら もう検索しない
+				canSearchedMachiningONumber = false
 			}
 
 			if i > 0 && canAppendFinallyM30 && regPercent.MatchString(line) {

@@ -35,6 +35,7 @@ ehthumbs.db
 
 # テスト出力ファイルは無視する
 **/testdata/**/output_*
+**/testdata/**/testResult*
 
 * - コピー.xlsx
 

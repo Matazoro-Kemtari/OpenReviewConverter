@@ -31,7 +31,7 @@ func main() {
 	}
 
 	// logの設定 https://qiita.com/kmtr/items/406073651d7a12aab9c6
-	file, err := os.OpenFile("app_json.log", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0655)
+	file, err := os.OpenFile("OpenReviewConverter_json.log", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0655)
 	if err != nil {
 		panic(err)
 	}
